@@ -1,0 +1,2587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';">
+    <title>Portfolio Mario 3D - Monde Interactif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f3460, #16213e);
+            overflow: hidden;
+            color: white;
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            cursor: grab;
+        }
+
+        #gameCanvas:active {
+            cursor: grabbing;
+        }
+
+        /* ========== HUD INTERFACE ========== */
+        .hud-3d {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 25px;
+            border-radius: 20px;
+            border: 3px solid #FFD700;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            font-family: 'Courier New', monospace;
+            min-width: 320px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .hud-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hud-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+            color: #FFD700;
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.1));
+            padding: 12px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .hud-item:hover {
+            background: linear-gradient(45deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+            transform: translateY(-2px);
+        }
+
+        .hud-info {
+            font-size: 12px;
+            color: #ccc;
+            text-align: center;
+            line-height: 1.5;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* ========== CONTRÔLES ========== */
+        .controls-3d {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 25px;
+            border-radius: 20px;
+            border: 3px solid #FFD700;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 55px);
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .control-key {
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(145deg, #4A90E2, #357ABD);
+            border: 2px solid #FFD700;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            font-size: 13px;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        .control-key:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.5);
+            background: linear-gradient(145deg, #5ba0f2, #4080cd);
+        }
+
+        .control-key.active {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            color: #000;
+            transform: translateY(1px);
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.6);
+        }
+
+        .control-space {
+            grid-column: 1 / 4;
+            width: 100%;
+            height: 45px;
+        }
+
+        .control-info {
+            text-align: center;
+            font-size: 11px;
+            color: #ccc;
+            line-height: 1.4;
+        }
+
+        /* ========== CROSSHAIR ========== */
+        .crosshair {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 999;
+            transition: all 0.3s ease;
+        }
+
+        .crosshair.interactable {
+            border-color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            transform: translate(-50%, -50%) scale(1.3);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .crosshair::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 6px;
+            height: 6px;
+            background: currentColor;
+            border-radius: 50%;
+        }
+
+        /* ========== MODAL PROJET ========== */
+        .room-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: linear-gradient(145deg, rgba(0, 0, 0, 0.95), rgba(20, 20, 40, 0.95));
+            padding: 40px;
+            border-radius: 25px;
+            border: 3px solid #FFD700;
+            text-align: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s ease;
+            z-index: 1001;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            backdrop-filter: blur(25px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .room-info.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .room-title {
+            font-size: 32px;
+            color: #FFD700;
+            margin-bottom: 25px;
+            font-weight: bold;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+        }
+
+        .room-description {
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            color: #e0e0e0;
+        }
+
+        .room-technologies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .tech-badge {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            transform: translateY(-2px);
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .room-btn {
+            padding: 15px 28px;
+            background: linear-gradient(145deg, #4A90E2, #357ABD);
+            border: 2px solid #FFD700;
+            border-radius: 30px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            font-size: 15px;
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+        }
+
+        .room-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 144, 226, 0.5);
+        }
+
+        .room-btn.primary {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            color: #000;
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .room-btn.primary:hover {
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+        }
+
+        /* ========== MINIMAP ========== */
+        .minimap-3d {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 220px;
+            height: 160px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 3px solid #FFD700;
+            border-radius: 15px;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .minimap-title {
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #FFD700;
+            padding: 8px;
+            background: rgba(255, 215, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .minimap-view {
+            width: 100%;
+            height: calc(100% - 32px);
+            position: relative;
+            background: radial-gradient(circle, #2d5a3d 0%, #1a3d2e 100%);
+        }
+
+        .minimap-player {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #FF4444;
+            border-radius: 50%;
+            border: 2px solid white;
+            transition: all 0.1s ease;
+            animation: playerPulse 2s ease-in-out infinite;
+            z-index: 10;
+        }
+
+        @keyframes playerPulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.8);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(255, 68, 68, 0);
+                transform: scale(1.1);
+            }
+        }
+
+        .minimap-room {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: 2px solid #FFA500;
+            border-radius: 4px;
+            opacity: 0.9;
+            transition: all 0.3s ease;
+        }
+
+        .minimap-room:hover {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+
+        /* ========== LOADING SCREEN ========== */
+        .loading-3d {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f1419, #1a1a2e, #16213e);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            transition: all 0.6s ease;
+        }
+
+        .loading-title {
+            font-size: 52px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, #FFD700, #FFA500, #FFD700);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.5);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .loading-progress {
+            width: 450px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .loading-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700);
+            background-size: 200% 100%;
+            border-radius: 15px;
+            width: 0%;
+            transition: width 0.4s ease;
+            animation: progressShine 2s linear infinite;
+        }
+
+        @keyframes progressShine {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .loading-text {
+            font-size: 20px;
+            color: #FFD700;
+            text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .loading-tips {
+            font-size: 14px;
+            color: #ccc;
+            text-align: center;
+            max-width: 500px;
+            line-height: 1.6;
+            opacity: 0.8;
+        }
+
+        /* ========== VUE INTÉRIEURE CHAMBRE ========== */
+        .room-interior {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            display: none;
+            z-index: 1500;
+            overflow: hidden;
+        }
+
+        .room-interior.active {
+            display: block;
+            animation: roomEnter 0.6s ease-out;
+        }
+
+        @keyframes roomEnter {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .room-walls {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background:
+                    linear-gradient(45deg, transparent 49%, rgba(255,255,255,0.03) 50%, transparent 51%),
+                    linear-gradient(-45deg, transparent 49%, rgba(255,255,255,0.03) 50%, transparent 51%);
+            background-size: 30px 30px;
+            opacity: 0.5;
+        }
+
+        .room-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 50px;
+            border-radius: 25px;
+            border: 3px solid #FFD700;
+            max-width: 85%;
+            max-height: 85%;
+            overflow-y: auto;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+        }
+
+        .exit-room {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: linear-gradient(145deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 18px 28px;
+            border-radius: 35px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            z-index: 10;
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .exit-room:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(231, 76, 60, 0.6);
+        }
+
+        /* ========== NOTIFICATIONS ========== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #FFD700;
+            padding: 18px 25px;
+            border-radius: 15px;
+            border: 2px solid #FFD700;
+            z-index: 10000;
+            max-width: 400px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: slideInFromRight 0.4s ease-out;
+        }
+
+        @keyframes slideInFromRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ========== SOUND TOGGLE ========== */
+        .sound-toggle {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 65px;
+            height: 65px;
+            background: rgba(0, 0, 0, 0.85);
+            border: 3px solid #FFD700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .sound-toggle:hover {
+            transform: scale(1.1);
+            background: rgba(255, 215, 0, 0.15);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        .sound-icon {
+            font-size: 26px;
+            color: #FFD700;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .hud-3d {
+                padding: 18px;
+                font-size: 14px;
+                min-width: 280px;
+            }
+
+            .controls-3d {
+                padding: 18px;
+            }
+
+            .control-key {
+                width: 45px;
+                height: 45px;
+                font-size: 11px;
+            }
+
+            .control-space {
+                height: 38px;
+            }
+
+            .minimap-3d {
+                width: 180px;
+                height: 130px;
+            }
+
+            .loading-title {
+                font-size: 36px;
+            }
+
+            .loading-progress {
+                width: 320px;
+            }
+
+            .room-info {
+                padding: 30px;
+                max-width: 95vw;
+            }
+
+            .room-content {
+                padding: 30px;
+                max-width: 95%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hud-3d {
+                padding: 15px;
+                min-width: 250px;
+            }
+
+            .hud-stats {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .control-grid {
+                grid-template-columns: repeat(3, 40px);
+                gap: 6px;
+            }
+
+            .control-key {
+                width: 40px;
+                height: 40px;
+                font-size: 10px;
+            }
+
+            .minimap-3d {
+                width: 150px;
+                height: 110px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <!-- Loading Screen -->
+    <div class="loading-3d" id="loading3D">
+        <h1 class="loading-title">🎮 Portfolio Mario 3D</h1>
+        <div class="loading-progress">
+            <div class="loading-bar" id="loadingBar"></div>
+        </div>
+        <div class="loading-text" id="loadingText">Initialisation du monde 3D...</div>
+        <div class="loading-tips">
+            💡 Explorez le monde, collectez des pièces et entrez dans les chambres pour découvrir mes projets !
+        </div>
+    </div>
+
+    <!-- Canvas 3D -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Crosshair -->
+    <div class="crosshair" id="crosshair"></div>
+
+    <!-- HUD -->
+    <div class="hud-3d">
+        <div class="hud-title">🎮 MARIO PORTFOLIO</div>
+        <div class="hud-stats">
+            <div class="hud-item">
+                <span>🏆</span>
+                <span id="score3D">0</span>
+            </div>
+            <div class="hud-item">
+                <span>🪙</span>
+                <span id="coins3D">0</span>
+            </div>
+            <div class="hud-item">
+                <span>📍</span>
+                <span id="room3D">Monde Central</span>
+            </div>
+            <div class="hud-item">
+                <span>🚪</span>
+                <span id="projectsCount">5 Projets</span>
+            </div>
+        </div>
+        <div class="hud-info">
+            🎯 Explorez le monde et découvrez mes projets !<br>
+            Approchez-vous des chambres et appuyez sur <strong>E</strong>
+        </div>
+    </div>
+
+    <!-- Minimap -->
+    <div class="minimap-3d">
+        <div class="minimap-title">🗺️ CARTE</div>
+        <div class="minimap-view">
+            <div class="minimap-player" id="minimapPlayer"></div>
+            <div class="minimap-room" style="top: 20px; left: 25px;" title="Projet C"></div>
+            <div class="minimap-room" style="top: 20px; right: 25px;" title="Projet Web"></div>
+            <div class="minimap-room" style="bottom: 20px; left: 25px;" title="Projet Java"></div>
+            <div class="minimap-room" style="bottom: 20px; right: 25px;" title="Projet Python"></div>
+            <div class="minimap-room" style="top: 50%; left: 50%; transform: translate(-50%, -50%);" title="Hub Central"></div>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-3d">
+        <div class="control-grid">
+            <div></div>
+            <div class="control-key" data-key="w" id="keyW">W</div>
+            <div></div>
+            <div class="control-key" data-key="a" id="keyA">A</div>
+            <div class="control-key" data-key="s" id="keyS">S</div>
+            <div class="control-key" data-key="d" id="keyD">D</div>
+            <div class="control-key control-space" data-key="e" id="keyE">E - Interagir</div>
+        </div>
+        <div class="control-info">
+            🖱️ Souris = Regarder autour<br>
+            🎯 WASD = Déplacer Mario<br>
+            🚪 E = Entrer dans les projets
+        </div>
+    </div>
+
+    <!-- Sound Toggle -->
+    <div class="sound-toggle" id="soundToggle">
+        <div class="sound-icon">🔊</div>
+    </div>
+
+    <!-- Room Info Modal -->
+    <div class="room-info" id="roomInfo">
+        <div class="room-title" id="roomTitle">Projet Portfolio</div>
+        <div class="room-description" id="roomDescription">
+            Description détaillée du projet et de ses objectifs techniques.
+        </div>
+        <div class="room-technologies" id="roomTechnologies">
+            <!-- Tech badges seront insérés ici -->
+        </div>
+        <div class="room-actions">
+            <button class="room-btn primary" id="enterRoom">🚪 Explorer le projet</button>
+            <button class="room-btn" id="downloadProject">📦 Télécharger ZIP</button>
+            <button class="room-btn" id="viewDetails">📄 Voir détails</button>
+            <button class="room-btn" id="closeRoom">❌ Fermer</button>
+        </div>
+    </div>
+
+    <!-- Room Interior View -->
+    <div class="room-interior" id="roomInterior">
+        <div class="room-walls"></div>
+        <button class="exit-room" id="exitRoom">🚪 Sortir</button>
+        <div class="room-content" id="roomContent">
+            <!-- Contenu de la chambre sera inséré ici -->
+        </div>
+    </div>
+</div>
+
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+    /**
+     * 🎮 PORTFOLIO MARIO 3D - JEUX COMPLET
+     * Un portfolio interactif sous forme de jeu 3D
+     * Naviguez dans un monde Mario et explorez mes projets !
+     */
+    class Mario3DPortfolio {
+        constructor() {
+            console.log('🎮 Initialisation du Portfolio Mario 3D...');
+
+            // Vérification Three.js
+            if (typeof THREE === 'undefined') {
+                this.showError('Three.js non chargé', 'Impossible de charger la bibliothèque 3D');
+                return;
+            }
+
+            this.initializeCore();
+            this.initializeGameState();
+            this.initializePlayerState();
+            this.initializeCameraState();
+            this.initializeWorldElements();
+            this.initializeGameStats();
+
+            this.init();
+        }
+
+        initializeCore() {
+            // Core Three.js
+            this.scene = new THREE.Scene();
+            this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            this.renderer = new THREE.WebGLRenderer({
+                canvas: document.getElementById('gameCanvas'),
+                antialias: true,
+                alpha: false,
+                powerPreference: "high-performance"
+            });
+            this.clock = new THREE.Clock();
+            this.raycaster = new THREE.Raycaster();
+            this.mouse = new THREE.Vector2();
+        }
+
+        initializeGameState() {
+            // État du jeu
+            this.gameLoaded = false;
+            this.gamePaused = false;
+            this.isInRoom = false;
+            this.currentRoom = null;
+            this.nearbyRoom = null;
+            this.animationTime = 0;
+            this.parentOrigin = window.location.origin;
+        }
+
+        initializePlayerState() {
+            // État du joueur
+            this.player = {
+                mesh: null,
+                position: new THREE.Vector3(0, 0, 0),
+                rotation: 0,
+                velocity: new THREE.Vector3(0, 0, 0),
+                // Augmentation de la vitesse du joueur pour un déplacement plus rapide
+                speed: 0.35,
+                rotationSpeed: 0.1,
+                isMoving: false,
+                onGround: true
+            };
+        }
+
+        initializeCameraState() {
+            // État de la caméra
+            this.cameraState = {
+                offset: new THREE.Vector3(0, 10, 15),
+                lookAtOffset: new THREE.Vector3(0, 3, 0),
+                smoothness: 0.08
+            };
+
+            // Contrôles
+            this.keys = {};
+            this.mouseControls = {
+                isPointerLocked: false,
+                sensitivity: 0.002,
+                yaw: 0,
+                pitch: 0
+            };
+        }
+
+        initializeWorldElements() {
+            // Éléments du monde
+            this.rooms = [];
+            this.collectibles = [];
+            this.walls = [];
+            this.interactables = [];
+        }
+
+        initializeGameStats() {
+            // Statistiques du jeu
+            this.score = 0;
+            this.coins = 0;
+            this.currentRoomName = "Monde Central";
+        }
+
+        async init() {
+            try {
+                await this.setupRenderer();
+                await this.setupScene();
+                await this.setupLighting();
+                await this.loadAssets();
+                await this.createWorld();
+                await this.createPlayer();
+                await this.createRooms();
+                await this.createCollectibles();
+                await this.setupControls();
+                await this.setupUI();
+                await this.setupCommunication();
+
+                this.gameLoaded = true;
+                console.log('✅ Jeu marqué comme chargé');
+
+                this.startGameLoop();
+                this.hideLoading();
+                this.sendMessage('GAME_READY', {});
+
+                console.log('🎉 Portfolio Mario 3D prêt !');
+
+            } catch (error) {
+                console.error('❌ Erreur d\'initialisation:', error);
+                this.showError('Erreur d\'initialisation', error.message);
+            }
+        }
+
+        async setupRenderer() {
+            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.renderer.setClearColor(0x87CEEB);
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            this.renderer.physicallyCorrectLights = true;
+            this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            this.renderer.toneMappingExposure = 1.0;
+            this.renderer.outputEncoding = THREE.sRGBEncoding;
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+            console.log('✅ Renderer configuré');
+        }
+
+        async setupScene() {
+            console.log('🌍 Création du monde...');
+
+            // Skybox
+            this.scene.background = new THREE.Color(0x87CEEB);
+            this.scene.fog = new THREE.Fog(0x87CEEB, 80, 300);
+
+            // Sol
+            await this.createGround();
+
+            // Murs de délimitation
+            await this.createBoundaryWalls();
+
+            console.log('✅ Monde créé');
+        }
+
+        async createGround() {
+            const groundGeometry = new THREE.PlaneGeometry(300, 300, 100, 100);
+
+            // Texture d'herbe procédurale améliorée
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const context = canvas.getContext('2d');
+
+            // Fond vert herbe principal
+            const gradient = context.createRadialGradient(512, 512, 0, 512, 512, 512);
+            gradient.addColorStop(0, '#3a5f2a');
+            gradient.addColorStop(0.5, '#2d5016');
+            gradient.addColorStop(1, '#1a3009');
+            context.fillStyle = gradient;
+            context.fillRect(0, 0, 1024, 1024);
+
+            // Brins d'herbe détaillés
+            for (let i = 0; i < 2000; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                const shade = Math.random() * 0.6 + 0.2;
+                const length = Math.random() * 4 + 2;
+
+                context.fillStyle = `hsl(${100 + Math.random() * 20}, 60%, ${shade * 100}%)`;
+                context.fillRect(x, y, 1, length);
+                context.fillRect(x + 1, y + 1, 1, length - 1);
+            }
+
+            // Petites fleurs colorées
+            const flowerColors = ['#ffff99', '#ff69b4', '#87ceeb', '#dda0dd', '#f0e68c'];
+            for (let i = 0; i < 100; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                const color = flowerColors[Math.floor(Math.random() * flowerColors.length)];
+
+                context.fillStyle = color;
+                context.beginPath();
+                context.arc(x, y, 3, 0, Math.PI * 2);
+                context.fill();
+
+                // Pétales
+                for (let j = 0; j < 6; j++) {
+                    const angle = (j / 6) * Math.PI * 2;
+                    const px = x + Math.cos(angle) * 4;
+                    const py = y + Math.sin(angle) * 4;
+                    context.beginPath();
+                    context.arc(px, py, 2, 0, Math.PI * 2);
+                    context.fill();
+                }
+            }
+
+            // Chemins et détails
+            for (let i = 0; i < 50; i++) {
+                const x = Math.random() * 1024;
+                const y = Math.random() * 1024;
+                context.fillStyle = 'rgba(139, 69, 19, 0.3)';
+                context.beginPath();
+                context.arc(x, y, Math.random() * 8 + 4, 0, Math.PI * 2);
+                context.fill();
+            }
+
+            const grassTexture = new THREE.CanvasTexture(canvas);
+            grassTexture.wrapS = THREE.RepeatWrapping;
+            grassTexture.wrapT = THREE.RepeatWrapping;
+            grassTexture.repeat.set(20, 20);
+
+            const groundMaterial = new THREE.MeshLambertMaterial({
+                map: grassTexture
+            });
+
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.position.y = -1;
+            ground.receiveShadow = true;
+            ground.userData.isGround = true;
+            this.scene.add(ground);
+        }
+
+        async createBoundaryWalls() {
+            const wallHeight = 20;
+            const wallThickness = 3;
+            const worldSize = 140;
+
+            const wallMaterial = new THREE.MeshLambertMaterial({
+                color: 0x8B4513,
+                transparent: true,
+                opacity: 0.7
+            });
+
+            const walls = [
+                { pos: [0, wallHeight/2, -worldSize], size: [worldSize*2, wallHeight, wallThickness] },
+                { pos: [0, wallHeight/2, worldSize], size: [worldSize*2, wallHeight, wallThickness] },
+                { pos: [-worldSize, wallHeight/2, 0], size: [wallThickness, wallHeight, worldSize*2] },
+                { pos: [worldSize, wallHeight/2, 0], size: [wallThickness, wallHeight, worldSize*2] }
+            ];
+
+            walls.forEach(wallData => {
+                const geometry = new THREE.BoxGeometry(...wallData.size);
+                const wall = new THREE.Mesh(geometry, wallMaterial);
+                wall.position.set(...wallData.pos);
+                wall.castShadow = true;
+                wall.receiveShadow = true;
+                wall.userData.isWall = true;
+                this.scene.add(wall);
+                this.walls.push(wall);
+            });
+        }
+
+        async setupLighting() {
+            console.log('💡 Configuration de l\'éclairage...');
+
+            // Lumière ambiante douce
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.5);
+            this.scene.add(ambientLight);
+
+            // Soleil principal avec ombres
+            const sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            sunLight.position.set(100, 100, 50);
+            sunLight.castShadow = true;
+            sunLight.shadow.mapSize.width = 4096;
+            sunLight.shadow.mapSize.height = 4096;
+            sunLight.shadow.camera.near = 0.5;
+            sunLight.shadow.camera.far = 1000;
+            sunLight.shadow.camera.left = -200;
+            sunLight.shadow.camera.right = 200;
+            sunLight.shadow.camera.top = 200;
+            sunLight.shadow.camera.bottom = -200;
+            sunLight.shadow.bias = -0.0001;
+            this.scene.add(sunLight);
+
+            // Lumière de remplissage
+            const fillLight = new THREE.DirectionalLight(0x87CEEB, 0.4);
+            fillLight.position.set(-50, 50, -50);
+            this.scene.add(fillLight);
+
+            // Lumière d'ambiance colorée
+            const skyLight = new THREE.HemisphereLight(0x87CEEB, 0x228B22, 0.6);
+            this.scene.add(skyLight);
+
+            console.log('✅ Éclairage configuré');
+        }
+
+        async loadAssets() {
+            const steps = [
+                'Chargement des textures haute qualité...',
+                'Génération du terrain procédural...',
+                'Création des modèles 3D...',
+                'Configuration des matériaux PBR...',
+                'Optimisation des performances...',
+                'Initialisation des systèmes de jeu...'
+            ];
+
+            for (let i = 0; i < steps.length; i++) {
+                document.getElementById('loadingText').textContent = steps[i];
+                document.getElementById('loadingBar').style.width = ((i + 1) / steps.length * 100) + '%';
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+
+        async createWorld() {
+            console.log('🏗️ Construction du monde...');
+
+            // Arbres décoratifs répartis naturellement
+            for (let i = 0; i < 35; i++) {
+                const tree = this.createTree();
+                const angle = (i / 35) * Math.PI * 2;
+                const radius = 60 + Math.random() * 80;
+                tree.position.set(
+                    Math.cos(angle) * radius + (Math.random() - 0.5) * 40,
+                    0,
+                    Math.sin(angle) * radius + (Math.random() - 0.5) * 40
+                );
+                this.scene.add(tree);
+            }
+
+            // Rochers et obstacles
+            for (let i = 0; i < 20; i++) {
+                const rock = this.createRock();
+                rock.position.set(
+                    (Math.random() - 0.5) * 200,
+                    -0.3,
+                    (Math.random() - 0.5) * 200
+                );
+                this.scene.add(rock);
+            }
+
+            // Fleurs dispersées
+            for (let i = 0; i < 60; i++) {
+                const flower = this.createFlower();
+                flower.position.set(
+                    (Math.random() - 0.5) * 180,
+                    -0.8,
+                    (Math.random() - 0.5) * 180
+                );
+                this.scene.add(flower);
+            }
+
+            // Nuages décoratifs
+            for (let i = 0; i < 8; i++) {
+                const cloud = this.createCloud();
+                cloud.position.set(
+                    (Math.random() - 0.5) * 400,
+                    30 + Math.random() * 20,
+                    (Math.random() - 0.5) * 400
+                );
+                this.scene.add(cloud);
+            }
+
+            console.log('✅ Monde construit avec 35 arbres, 20 rochers, 60 fleurs et 8 nuages');
+        }
+
+        createTree() {
+            const treeGroup = new THREE.Group();
+
+            // Tronc avec texture
+            const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.8, 6, 12);
+            const trunkMaterial = new THREE.MeshLambertMaterial({
+                color: 0x8B4513,
+                roughness: 0.8
+            });
+            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+            trunk.position.y = 3;
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+            treeGroup.add(trunk);
+
+            // Feuillage en plusieurs couches
+            const leafColors = [0x228B22, 0x32CD32, 0x90EE90, 0x006400];
+            for (let i = 0; i < 4; i++) {
+                const leafGeometry = new THREE.SphereGeometry(2.5 - i * 0.3, 12, 8);
+                const leafMaterial = new THREE.MeshLambertMaterial({
+                    color: leafColors[i],
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const leaves = new THREE.Mesh(leafGeometry, leafMaterial);
+                leaves.position.y = 6 + i * 1.2;
+                leaves.castShadow = true;
+                treeGroup.add(leaves);
+            }
+
+            treeGroup.userData.isTree = true;
+            return treeGroup;
+        }
+
+        createRock() {
+            const rockGeometry = new THREE.DodecahedronGeometry(Math.random() * 2 + 1);
+            const rockMaterial = new THREE.MeshLambertMaterial({
+                color: new THREE.Color().setHSL(0, 0, 0.3 + Math.random() * 0.3),
+                flatShading: true
+            });
+            const rock = new THREE.Mesh(rockGeometry, rockMaterial);
+            rock.rotation.set(
+                Math.random() * Math.PI,
+                Math.random() * Math.PI,
+                Math.random() * Math.PI
+            );
+            rock.castShadow = true;
+            rock.receiveShadow = true;
+            rock.userData.isObstacle = true;
+            return rock;
+        }
+
+        createFlower() {
+            const flowerGroup = new THREE.Group();
+
+            // Tige
+            const stemGeometry = new THREE.CylinderGeometry(0.03, 0.04, 0.8, 6);
+            const stemMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+            const stem = new THREE.Mesh(stemGeometry, stemMaterial);
+            stem.position.y = 0.4;
+            flowerGroup.add(stem);
+
+            // Fleur colorée
+            const petalColors = [0xFF69B4, 0xFFD700, 0xFF6347, 0x9370DB, 0x00CED1, 0xFF1493];
+            const petalColor = petalColors[Math.floor(Math.random() * petalColors.length)];
+
+            // Centre de la fleur
+            const centerGeometry = new THREE.SphereGeometry(0.08, 8, 6);
+            const centerMaterial = new THREE.MeshLambertMaterial({ color: 0xFFD700 });
+            const center = new THREE.Mesh(centerGeometry, centerMaterial);
+            center.position.y = 0.9;
+            flowerGroup.add(center);
+
+            // Pétales autour
+            for (let i = 0; i < 8; i++) {
+                const petalGeometry = new THREE.SphereGeometry(0.15, 8, 6);
+                const petalMaterial = new THREE.MeshLambertMaterial({ color: petalColor });
+                const petal = new THREE.Mesh(petalGeometry, petalMaterial);
+
+                const angle = (i / 8) * Math.PI * 2;
+                petal.position.set(
+                    Math.cos(angle) * 0.25,
+                    0.9,
+                    Math.sin(angle) * 0.25
+                );
+                flowerGroup.add(petal);
+            }
+
+            flowerGroup.userData.isFlower = true;
+            return flowerGroup;
+        }
+
+        createCloud() {
+            const cloudGroup = new THREE.Group();
+            const cloudMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            // Plusieurs sphères pour former un nuage
+            for (let i = 0; i < 6; i++) {
+                const cloudGeometry = new THREE.SphereGeometry(2 + Math.random() * 3, 8, 6);
+                const cloudPart = new THREE.Mesh(cloudGeometry, cloudMaterial);
+                cloudPart.position.set(
+                    (Math.random() - 0.5) * 8,
+                    (Math.random() - 0.5) * 2,
+                    (Math.random() - 0.5) * 8
+                );
+                cloudGroup.add(cloudPart);
+            }
+
+            cloudGroup.userData.isCloud = true;
+            return cloudGroup;
+        }
+
+        async createPlayer() {
+            console.log('👤 Création de Mario...');
+
+            const playerGroup = new THREE.Group();
+
+            // Corps principal de Mario
+            const bodyGeometry = new THREE.CylinderGeometry(1, 1.1, 2.5, 16);
+            const bodyMaterial = new THREE.MeshLambertMaterial({
+                color: 0x0066CC,
+                emissive: 0x001122,
+                emissiveIntensity: 0.1
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 1.25;
+            body.castShadow = true;
+            body.receiveShadow = true;
+            playerGroup.add(body);
+
+            // Tête avec détails
+            const headGeometry = new THREE.SphereGeometry(0.8, 16, 12);
+            const headMaterial = new THREE.MeshLambertMaterial({ color: 0xFFDBB5 });
+            const head = new THREE.Mesh(headGeometry, headMaterial);
+            head.position.y = 3.2;
+            head.castShadow = true;
+            head.receiveShadow = true;
+            playerGroup.add(head);
+
+            // Casquette rouge iconique
+            const capGeometry = new THREE.SphereGeometry(0.85, 16, 12, 0, Math.PI * 2, 0, Math.PI / 2);
+            const capMaterial = new THREE.MeshLambertMaterial({
+                color: 0xFF0000,
+                emissive: 0x220000,
+                emissiveIntensity: 0.1
+            });
+            const cap = new THREE.Mesh(capGeometry, capMaterial);
+            cap.position.y = 3.8;
+            cap.castShadow = true;
+            playerGroup.add(cap);
+
+            // Visière de la casquette
+            const visorGeometry = new THREE.CylinderGeometry(1, 1, 0.1, 16);
+            const visorMaterial = new THREE.MeshLambertMaterial({ color: 0xCC0000 });
+            const visor = new THREE.Mesh(visorGeometry, visorMaterial);
+            visor.position.set(0, 3.4, 0.6);
+            visor.rotation.x = -0.4;
+            visor.castShadow = true;
+            playerGroup.add(visor);
+
+            // Moustache caractéristique
+            const mustacheGeometry = new THREE.BoxGeometry(0.5, 0.15, 0.25);
+            const mustacheMaterial = new THREE.MeshLambertMaterial({ color: 0x654321 });
+            const mustache = new THREE.Mesh(mustacheGeometry, mustacheMaterial);
+            mustache.position.set(0, 3, 0.75);
+            playerGroup.add(mustache);
+
+            // Yeux
+            const eyeGeometry = new THREE.SphereGeometry(0.12, 8, 6);
+            const eyeMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+
+            const leftEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            leftEye.position.set(-0.3, 3.15, 0.7);
+            playerGroup.add(leftEye);
+
+            const rightEye = new THREE.Mesh(eyeGeometry, eyeMaterial);
+            rightEye.position.set(0.3, 3.15, 0.7);
+            playerGroup.add(rightEye);
+
+            // Nez
+            const noseGeometry = new THREE.SphereGeometry(0.18, 8, 6);
+            const noseMaterial = new THREE.MeshLambertMaterial({ color: 0xFFDBB5 });
+            const nose = new THREE.Mesh(noseGeometry, noseMaterial);
+            nose.position.set(0, 3, 0.8);
+            playerGroup.add(nose);
+
+            // Bras articulés
+            const armGeometry = new THREE.CylinderGeometry(0.25, 0.3, 1.8, 12);
+            const armMaterial = new THREE.MeshLambertMaterial({ color: 0xFFDBB5 });
+
+            const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+            leftArm.position.set(-1.3, 1.8, 0);
+            leftArm.rotation.z = 0.5;
+            leftArm.castShadow = true;
+            leftArm.userData.isLeftArm = true;
+            playerGroup.add(leftArm);
+
+            const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+            rightArm.position.set(1.3, 1.8, 0);
+            rightArm.rotation.z = -0.5;
+            rightArm.castShadow = true;
+            rightArm.userData.isRightArm = true;
+            playerGroup.add(rightArm);
+
+            // Gants blancs
+            const gloveGeometry = new THREE.SphereGeometry(0.35, 12, 8);
+            const gloveMaterial = new THREE.MeshLambertMaterial({ color: 0xFFFFFF });
+
+            const leftGlove = new THREE.Mesh(gloveGeometry, gloveMaterial);
+            leftGlove.position.set(-1.6, 1, 0);
+            leftGlove.castShadow = true;
+            playerGroup.add(leftGlove);
+
+            const rightGlove = new THREE.Mesh(gloveGeometry, gloveMaterial);
+            rightGlove.position.set(1.6, 1, 0);
+            rightGlove.castShadow = true;
+            playerGroup.add(rightGlove);
+
+            // Jambes
+            const legGeometry = new THREE.CylinderGeometry(0.3, 0.35, 1.5, 12);
+            const legMaterial = new THREE.MeshLambertMaterial({ color: 0x0066CC });
+
+            const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+            leftLeg.position.set(-0.5, -0.75, 0);
+            leftLeg.castShadow = true;
+            leftLeg.userData.isLeftLeg = true;
+            playerGroup.add(leftLeg);
+
+            const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+            rightLeg.position.set(0.5, -0.75, 0);
+            rightLeg.castShadow = true;
+            rightLeg.userData.isRightLeg = true;
+            playerGroup.add(rightLeg);
+
+            // Chaussures brunes
+            const shoeGeometry = new THREE.BoxGeometry(0.8, 0.5, 1.2);
+            const shoeMaterial = new THREE.MeshLambertMaterial({ color: 0x654321 });
+
+            const leftShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
+            leftShoe.position.set(-0.5, -1.4, 0.1);
+            leftShoe.castShadow = true;
+            playerGroup.add(leftShoe);
+
+            const rightShoe = new THREE.Mesh(shoeGeometry, shoeMaterial);
+            rightShoe.position.set(0.5, -1.4, 0.1);
+            rightShoe.castShadow = true;
+            playerGroup.add(rightShoe);
+
+            // Configuration finale
+            playerGroup.userData.isPlayer = true;
+            this.player.mesh = playerGroup;
+            this.scene.add(playerGroup);
+
+            // Position et caméra initiales
+            this.player.position.set(0, 0, 0);
+            this.updatePlayerMesh();
+            this.updateCamera();
+
+            console.log('✅ Mario créé avec détails complets');
+        }
+
+        async createRooms() {
+            console.log('🏠 Création des chambres de projets...');
+
+            const projectData = [
+                {
+                    id: 'gestion-vols',
+                    name: "Gestion des vols - GESTION'AIR",
+                    position: { x: 50, z: 50 },
+                    color: 0xFF6B6B,
+                    icon: "💻",
+                    description: "Application complète en C pour la gestion des vols commerciaux avec recherche avancée et gestion temps réel des infrastructures aéroportuaires. Système complet avec base de données, interface utilisateur et algorithmes d'optimisation.",
+                    technologies: ['C', 'Algorithmique', 'Structures de données', 'Gestion mémoire', 'Interface graphique'],
+                    consigne: "Développer un système de gestion des vols pour l'aéroport Grenoble Alpes Isère avec affichage temps réel, optimisation des ressources et interface intuitive pour les opérateurs.",
+                    zipFile: "files/projet_c_gestion_vols.zip",
+                    features: ["Recherche avancée de vols", "Gestion temps réel", "Optimisation des créneaux", "Interface opérateur"]
+                },
+                {
+                    id: 'transport-propre',
+                    name: "Université & Transports Propres",
+                    position: { x: -50, z: 50 },
+                    color: 0x4ECDC4,
+                    icon: "🌱",
+                    description: "Site web responsive développé pour promouvoir les initiatives universitaires en faveur des transports durables et de la mobilité écologique. Design moderne avec animations CSS et galeries interactives.",
+                    technologies: ['HTML5', 'CSS3', 'JavaScript', 'Responsive Design', 'UI/UX', 'Animation CSS'],
+                    consigne: "Créer un site web responsive présentant les initiatives universitaires pour la mobilité durable avec galeries interactives, animations fluides et design moderne.",
+                    zipFile: "files/projet_site_transport_propre.zip",
+                    features: ["Design responsive", "Galeries interactives", "Animations CSS", "Interface moderne"]
+                },
+                {
+                    id: 'planification-aerien',
+                    name: "Planification Transport Aérien",
+                    position: { x: 50, z: -50 },
+                    color: 0x45B7D1,
+                    icon: "✈️",
+                    description: "Système sophistiqué de gestion de l'espace aérien français utilisant la théorie des graphes et les algorithmes de coloration pour optimiser les trajectoires de vol et minimiser les conflits.",
+                    technologies: ['Java', 'Graphstream', 'Algorithmes de graphe', 'Interface graphique', 'Optimisation', 'Visualisation'],
+                    consigne: "Implémenter un système de planification utilisant la coloration de graphes pour minimiser les conflits entre trajectoires de vol avec visualisation en temps réel.",
+                    zipFile: "files/projet_java_planification.zip",
+                    features: ["Algorithmes de graphes", "Coloration automatique", "Visualisation 3D", "Optimisation temps réel"]
+                },
+                {
+                    id: 'street-fighter',
+                    name: "Jeu de Combat Street Fighter",
+                    position: { x: -50, z: -50 },
+                    color: 0xF093FB,
+                    icon: "🥊",
+                    description: "Jeu de combat complet inspiré de Street Fighter, développé en Python avec Pygame. Intègre des mécaniques avancées, système de combos, animations fluides et environnements interactifs multiples.",
+                    technologies: ['Python', 'Pygame', 'Game Design', 'Animations', 'IA', 'Sound Design'],
+                    consigne: "Développer un jeu de combat avec système de coups spéciaux, animations fluides, environnements interactifs multiples et intelligence artificielle pour les adversaires.",
+                    zipFile: "files/projet_python_street_fighter.zip",
+                    features: ["Système de combos", "IA avancée", "Animations fluides", "Multiples personnages"]
+                },
+                {
+                    id: 'app-communicante',
+                    name: "Application Communicante",
+                    position: { x: 0, z: 80 },
+                    color: 0xA8EDEA,
+                    icon: "💬",
+                    description: "Plateforme collaborative complète permettant la gestion de contenus multimédias et les interactions communautaires. Architecture MVC avec API RESTful et système d'authentification sécurisé.",
+                    technologies: ['PHP', 'JavaScript', 'SQL', 'Framework MVC', 'API REST', 'Sécurité'],
+                    consigne: "Créer une application web collaborative avec gestion de contenus multimédias, système d'authentification sécurisé et API RESTful pour les interactions.",
+                    zipFile: "files/projet_php_app_communicante.zip",
+                    features: ["Architecture MVC", "API RESTful", "Authentification sécurisée", "Gestion multimédia"]
+                }
+            ];
+
+            projectData.forEach(project => {
+                const room = this.createRoom(project);
+                this.scene.add(room);
+                this.rooms.push({
+                    mesh: room,
+                    data: project
+                });
+            });
+
+            console.log('✅ 5 chambres de projets créées avec détails complets');
+        }
+
+        createRoom(projectData) {
+            const roomGroup = new THREE.Group();
+
+            // Base de la chambre avec bordures
+            const baseGeometry = new THREE.BoxGeometry(15, 0.8, 15);
+            const baseMaterial = new THREE.MeshLambertMaterial({
+                color: 0x8B4513,
+                emissive: 0x221100,
+                emissiveIntensity: 0.1
+            });
+            const base = new THREE.Mesh(baseGeometry, baseMaterial);
+            base.position.y = 0.4;
+            base.receiveShadow = true;
+            base.castShadow = true;
+            roomGroup.add(base);
+
+            // Murs de la chambre avec couleur thématique
+            const wallGeometry = new THREE.BoxGeometry(15, 10, 0.8);
+            const wallMaterial = new THREE.MeshLambertMaterial({
+                color: projectData.color,
+                transparent: true,
+                opacity: 0.85,
+                emissive: projectData.color,
+                emissiveIntensity: 0.1
+            });
+
+            // Mur arrière
+            const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
+            backWall.position.set(0, 5, -7);
+            backWall.castShadow = true;
+            backWall.receiveShadow = true;
+            roomGroup.add(backWall);
+
+            // Murs latéraux
+            const sideWallGeometry = new THREE.BoxGeometry(0.8, 10, 15);
+            const leftWall = new THREE.Mesh(sideWallGeometry, wallMaterial);
+            leftWall.position.set(-7, 5, 0);
+            leftWall.castShadow = true;
+            leftWall.receiveShadow = true;
+            roomGroup.add(leftWall);
+
+            const rightWall = new THREE.Mesh(sideWallGeometry, wallMaterial);
+            rightWall.position.set(7, 5, 0);
+            rightWall.castShadow = true;
+            rightWall.receiveShadow = true;
+            roomGroup.add(rightWall);
+
+            // Toit pyramidal
+            const roofGeometry = new THREE.ConeGeometry(12, 6, 8);
+            const roofMaterial = new THREE.MeshLambertMaterial({
+                color: 0x8B0000,
+                emissive: 0x220000,
+                emissiveIntensity: 0.1
+            });
+            const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+            roof.position.y = 13;
+            roof.rotation.y = Math.PI / 8;
+            roof.castShadow = true;
+            roomGroup.add(roof);
+
+            // Porte d'entrée élégante
+            const doorGeometry = new THREE.BoxGeometry(4, 8, 0.5);
+            const doorMaterial = new THREE.MeshLambertMaterial({
+                color: 0x654321,
+                emissive: 0x111111,
+                emissiveIntensity: 0.1
+            });
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(0, 4, 7.25);
+            door.castShadow = true;
+            door.receiveShadow = true;
+            roomGroup.add(door);
+
+            // Poignée de porte
+            const handleGeometry = new THREE.SphereGeometry(0.15, 8, 6);
+            const handleMaterial = new THREE.MeshLambertMaterial({ color: 0xFFD700 });
+            const handle = new THREE.Mesh(handleGeometry, handleMaterial);
+            handle.position.set(1.5, 4, 7.5);
+            roomGroup.add(handle);
+
+            // Panneau décoratif avec icône
+            const panelGeometry = new THREE.PlaneGeometry(3, 3);
+            const panelMaterial = new THREE.MeshLambertMaterial({
+                color: 0xFFFFFF,
+                emissive: 0x111111,
+                emissiveIntensity: 0.05
+            });
+            const panel = new THREE.Mesh(panelGeometry, panelMaterial);
+            panel.position.set(0, 7, 7.5);
+            roomGroup.add(panel);
+
+            // Fenêtres décoratives
+            const windowGeometry = new THREE.PlaneGeometry(2, 2.5);
+            const windowMaterial = new THREE.MeshLambertMaterial({
+                color: 0x87CEEB,
+                transparent: true,
+                opacity: 0.7,
+                emissive: 0x001122,
+                emissiveIntensity: 0.2
+            });
+
+            const leftWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+            leftWindow.position.set(-4, 6, 7.1);
+            roomGroup.add(leftWindow);
+
+            const rightWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+            rightWindow.position.set(4, 6, 7.1);
+            roomGroup.add(rightWindow);
+
+            // Lumière de chambre avec couleur thématique
+            const roomLight = new THREE.PointLight(projectData.color, 1.2, 35);
+            roomLight.position.set(0, 8, 0);
+            roomLight.castShadow = true;
+            roomLight.shadow.mapSize.width = 1024;
+            roomLight.shadow.mapSize.height = 1024;
+            roomGroup.add(roomLight);
+
+            // Décoration supplémentaire - piliers
+            for (let i = 0; i < 4; i++) {
+                const pillarGeometry = new THREE.CylinderGeometry(0.3, 0.4, 10, 8);
+                const pillarMaterial = new THREE.MeshLambertMaterial({ color: 0x696969 });
+                const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
+
+                const angle = (i / 4) * Math.PI * 2;
+                pillar.position.set(
+                    Math.cos(angle) * 6,
+                    5,
+                    Math.sin(angle) * 6
+                );
+                pillar.castShadow = true;
+                pillar.receiveShadow = true;
+                roomGroup.add(pillar);
+            }
+
+            // Position de la chambre
+            roomGroup.position.set(projectData.position.x, 0, projectData.position.z);
+
+            // Données pour l'interaction
+            roomGroup.userData = {
+                isRoom: true,
+                projectData: projectData,
+                originalY: 0,
+                floatOffset: Math.random() * Math.PI * 2
+            };
+
+            // Zone d'interaction élargie
+            const interactionGeometry = new THREE.BoxGeometry(20, 12, 20);
+            const interactionMaterial = new THREE.MeshBasicMaterial({
+                transparent: true,
+                opacity: 0,
+                visible: false
+            });
+            const interactionZone = new THREE.Mesh(interactionGeometry, interactionMaterial);
+            interactionZone.position.set(0, 6, 0);
+            interactionZone.userData = {
+                isInteractionZone: true,
+                roomData: projectData
+            };
+            roomGroup.add(interactionZone);
+
+            return roomGroup;
+        }
+
+        async createCollectibles() {
+            console.log('💰 Création des collectibles...');
+
+            // Pièces dorées dispersées
+            for (let i = 0; i < 40; i++) {
+                const coin = this.createCoin();
+                coin.position.set(
+                    (Math.random() - 0.5) * 220,
+                    Math.random() * 8 + 2,
+                    (Math.random() - 0.5) * 220
+                );
+                this.scene.add(coin);
+                this.collectibles.push({
+                    mesh: coin,
+                    type: 'coin',
+                    value: 100,
+                    collected: false
+                });
+            }
+
+            // Power-ups magiques
+            for (let i = 0; i < 15; i++) {
+                const powerUp = this.createPowerUp();
+                powerUp.position.set(
+                    (Math.random() - 0.5) * 180,
+                    Math.random() * 10 + 3,
+                    (Math.random() - 0.5) * 180
+                );
+                this.scene.add(powerUp);
+                this.collectibles.push({
+                    mesh: powerUp,
+                    type: 'powerup',
+                    value: 500,
+                    collected: false
+                });
+            }
+
+            // Étoiles spéciales
+            for (let i = 0; i < 8; i++) {
+                const star = this.createStar();
+                star.position.set(
+                    (Math.random() - 0.5) * 160,
+                    Math.random() * 12 + 4,
+                    (Math.random() - 0.5) * 160
+                );
+                this.scene.add(star);
+                this.collectibles.push({
+                    mesh: star,
+                    type: 'star',
+                    value: 1000,
+                    collected: false
+                });
+            }
+
+            console.log('✅ Collectibles créés: 40 pièces, 15 power-ups, 8 étoiles');
+        }
+
+        createCoin() {
+            const coinGeometry = new THREE.CylinderGeometry(0.6, 0.6, 0.15, 16);
+            const coinMaterial = new THREE.MeshLambertMaterial({
+                color: 0xFFD700,
+                emissive: 0x444400,
+                emissiveIntensity: 0.3
+            });
+            const coin = new THREE.Mesh(coinGeometry, coinMaterial);
+            coin.castShadow = true;
+            coin.userData = {
+                originalY: coin.position.y,
+                spinSpeed: Math.random() * 0.2 + 0.15,
+                floatOffset: Math.random() * Math.PI * 2,
+                isCoin: true
+            };
+            return coin;
+        }
+
+        createPowerUp() {
+            const powerUpGeometry = new THREE.SphereGeometry(1, 16, 12);
+            const powerUpMaterial = new THREE.MeshLambertMaterial({
+                color: 0xFF69B4,
+                emissive: 0xFF1493,
+                emissiveIntensity: 0.4,
+                transparent: true,
+                opacity: 0.9
+            });
+            const powerUp = new THREE.Mesh(powerUpGeometry, powerUpMaterial);
+            powerUp.castShadow = true;
+            powerUp.userData = {
+                originalY: powerUp.position.y,
+                pulseOffset: Math.random() * Math.PI * 2,
+                isPowerUp: true
+            };
+            return powerUp;
+        }
+
+        createStar() {
+            const starGroup = new THREE.Group();
+
+            // Étoile à 5 branches
+            const starShape = new THREE.Shape();
+            const outerRadius = 0.8;
+            const innerRadius = 0.4;
+
+            for (let i = 0; i < 10; i++) {
+                const angle = (i / 10) * Math.PI * 2;
+                const radius = i % 2 === 0 ? outerRadius : innerRadius;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+
+                if (i === 0) {
+                    starShape.moveTo(x, y);
+                } else {
+                    starShape.lineTo(x, y);
+                }
+            }
+            starShape.closePath();
+
+            const starGeometry = new THREE.ExtrudeGeometry(starShape, {
+                depth: 0.2,
+                bevelEnabled: true,
+                bevelSegments: 2,
+                steps: 2,
+                bevelSize: 0.1,
+                bevelThickness: 0.1
+            });
+
+            const starMaterial = new THREE.MeshLambertMaterial({
+                color: 0xFFFF00,
+                emissive: 0xFFFF00,
+                emissiveIntensity: 0.3
+            });
+
+            const star = new THREE.Mesh(starGeometry, starMaterial);
+            star.castShadow = true;
+            starGroup.add(star);
+
+            starGroup.userData = {
+                originalY: starGroup.position.y,
+                rotationSpeed: Math.random() * 0.1 + 0.05,
+                pulseOffset: Math.random() * Math.PI * 2,
+                isStar: true
+            };
+
+            return starGroup;
+        }
+
+        async setupControls() {
+            console.log('🎮 Configuration des contrôles...');
+
+            // Gestionnaires clavier
+            document.addEventListener('keydown', (e) => {
+                if (this.gamePaused) return;
+
+                const key = e.key.toLowerCase();
+                this.keys[key] = true;
+
+                this.updateControlVisuals(key, true);
+
+                if (key === 'e') {
+                    this.handleInteraction();
+                }
+
+                // Empêcher le défilement
+                if(['w', 'a', 's', 'd', ' ', 'e', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+                    e.preventDefault();
+                }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                const key = e.key.toLowerCase();
+                this.keys[key] = false;
+                this.updateControlVisuals(key, false);
+            });
+
+            // Contrôles souris améliorés
+            document.addEventListener('mousemove', (e) => {
+                if (this.gamePaused || this.isInRoom) return;
+
+                const movementX = e.movementX || 0;
+                const movementY = e.movementY || 0;
+
+                this.mouseControls.yaw -= movementX * this.mouseControls.sensitivity;
+                this.mouseControls.pitch -= movementY * this.mouseControls.sensitivity;
+
+                // Limiter les angles
+                this.mouseControls.pitch = Math.max(-Math.PI/2.5, Math.min(Math.PI/6, this.mouseControls.pitch));
+            });
+
+            // Pointer lock amélioré
+            document.addEventListener('click', () => {
+                if (!this.isInRoom && !this.gamePaused) {
+                    document.getElementById('gameCanvas').requestPointerLock();
+                }
+            });
+
+            // Contrôles tactiles
+            this.setupTouchControls();
+
+            // Redimensionnement
+            window.addEventListener('resize', () => {
+                this.handleResize();
+            });
+
+            console.log('✅ Contrôles configurés');
+        }
+
+        setupTouchControls() {
+            document.querySelectorAll('.control-key').forEach(key => {
+                const keyCode = key.getAttribute('data-key');
+
+                // Touch events
+                key.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (this.gamePaused) return;
+                    this.keys[keyCode] = true;
+                    key.classList.add('active');
+
+                    if (keyCode === 'e') {
+                        this.handleInteraction();
+                    }
+                });
+
+                key.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    this.keys[keyCode] = false;
+                    key.classList.remove('active');
+                });
+
+                // Mouse events
+                key.addEventListener('mousedown', (e) => {
+                    e.preventDefault();
+                    if (this.gamePaused) return;
+                    this.keys[keyCode] = true;
+                    key.classList.add('active');
+
+                    if (keyCode === 'e') {
+                        this.handleInteraction();
+                    }
+                });
+
+                key.addEventListener('mouseup', (e) => {
+                    e.preventDefault();
+                    this.keys[keyCode] = false;
+                    key.classList.remove('active');
+                });
+
+                key.addEventListener('mouseleave', (e) => {
+                    this.keys[keyCode] = false;
+                    key.classList.remove('active');
+                });
+            });
+        }
+
+        updateControlVisuals(key, isPressed) {
+            const keyElements = {
+                'w': 'keyW',
+                'a': 'keyA',
+                's': 'keyS',
+                'd': 'keyD',
+                'e': 'keyE'
+            };
+
+            const element = document.getElementById(keyElements[key]);
+            if (element) {
+                if (isPressed) {
+                    element.classList.add('active');
+                } else {
+                    element.classList.remove('active');
+                }
+            }
+        }
+
+        async setupUI() {
+            console.log('🖥️ Configuration de l\'interface...');
+
+            // Toggle son
+            document.getElementById('soundToggle').addEventListener('click', () => {
+                const icon = document.querySelector('.sound-icon');
+                const isMuted = icon.textContent === '🔇';
+                icon.textContent = isMuted ? '🔊' : '🔇';
+                this.showNotification(isMuted ? '🔊 Son activé' : '🔇 Son désactivé');
+            });
+
+            // Gestion du modal de chambre
+            document.getElementById('closeRoom').addEventListener('click', () => {
+                this.closeRoomModal();
+            });
+
+            document.getElementById('enterRoom').addEventListener('click', () => {
+                if (this.currentRoom) {
+                    this.enterRoom(this.currentRoom);
+                }
+            });
+
+            document.getElementById('downloadProject').addEventListener('click', () => {
+                if (this.currentRoom) {
+                    this.downloadProject(this.currentRoom);
+                }
+            });
+
+            document.getElementById('viewDetails').addEventListener('click', () => {
+                if (this.currentRoom) {
+                    this.viewProjectDetails(this.currentRoom);
+                }
+            });
+
+            // Bouton de sortie de chambre
+            document.getElementById('exitRoom').addEventListener('click', () => {
+                this.exitRoom();
+            });
+
+            console.log('✅ Interface configurée');
+        }
+
+        async setupCommunication() {
+            // Messages du parent
+            window.addEventListener('message', (event) => {
+                if (event.origin !== this.parentOrigin) return;
+                this.handleParentMessage(event.data);
+            });
+        }
+
+        handleParentMessage(data) {
+            if (!data || typeof data !== 'object') return;
+
+            switch (data.type) {
+                case 'GAME_PAUSE':
+                    this.pauseGame();
+                    break;
+                case 'GAME_RESUME':
+                    this.resumeGame();
+                    break;
+                case 'WINDOW_RESIZE':
+                    this.handleResize();
+                    break;
+                case 'PORTFOLIO_INIT':
+                    console.log('📊 Données portfolio reçues:', data.data);
+                    break;
+                case 'GAME_DESTROY':
+                    this.destroy();
+                    break;
+            }
+        }
+
+        sendMessage(type, data) {
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        type: type,
+                        data: data
+                    }, this.parentOrigin);
+                }
+            } catch (error) {
+                console.error('❌ Erreur envoi message:', error);
+            }
+        }
+
+        // ===================== MÉTHODES DE JEU PRINCIPALES =====================
+
+        startGameLoop() {
+            const animate = () => {
+                if (!this.gameLoaded) return;
+
+                requestAnimationFrame(animate);
+
+                const delta = this.clock.getDelta();
+                this.animationTime += delta;
+
+                // Mise à jour des systèmes de jeu
+                this.updatePlayer();
+                this.animateCollectibles();
+                this.animateRooms();
+                this.animateEnvironment();
+                this.updateMinimap();
+
+                // Rendu final
+                this.renderer.render(this.scene, this.camera);
+            };
+
+            animate();
+            console.log('🎬 Boucle de jeu démarrée');
+        }
+
+        updatePlayer() {
+            if (this.gamePaused || !this.gameLoaded || this.isInRoom) return;
+
+            const isMoving = this.keys['w'] || this.keys['s'] || this.keys['a'] || this.keys['d'];
+
+            // Calcul du mouvement
+            const direction = new THREE.Vector3();
+            const speed = this.player.speed;
+
+            if (this.keys['w']) direction.z -= 1;
+            if (this.keys['s']) direction.z += 1;
+            if (this.keys['a']) direction.x -= 1;
+            if (this.keys['d']) direction.x += 1;
+
+            // Normalisation et mouvement
+            if (direction.length() > 0) {
+                direction.normalize();
+
+                const newPosition = this.player.position.clone();
+                newPosition.add(direction.multiplyScalar(speed));
+
+                if (!this.checkCollisions(newPosition)) {
+                    this.player.position.copy(newPosition);
+                    this.player.isMoving = true;
+
+                    // Rotation du joueur
+                    if (direction.length() > 0) {
+                        this.player.rotation = Math.atan2(direction.x, direction.z);
+                    }
+                }
+            } else {
+                this.player.isMoving = false;
+            }
+
+            this.updatePlayerMesh();
+            this.updateCamera();
+            this.checkCollectibles();
+            this.checkInteractionZones();
+        }
+
+        checkCollisions(newPosition) {
+            const playerBox = new THREE.Box3().setFromCenterAndSize(
+                newPosition,
+                new THREE.Vector3(2, 4, 2)
+            );
+
+            // Vérification murs du monde
+            for (let wall of this.walls) {
+                const wallBox = new THREE.Box3().setFromObject(wall);
+                if (playerBox.intersectsBox(wallBox)) {
+                    return true;
+                }
+            }
+
+            // Vérification chambres
+            for (let room of this.rooms) {
+                const roomBox = new THREE.Box3().setFromObject(room.mesh);
+                roomBox.expandByScalar(-3);
+                if (playerBox.intersectsBox(roomBox)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        updatePlayerMesh() {
+            if (!this.player.mesh) return;
+
+            // Position et rotation
+            this.player.mesh.position.copy(this.player.position);
+            this.player.mesh.rotation.y = this.player.rotation;
+
+            // Animations de marche
+            if (this.player.isMoving) {
+                const bobAmount = Math.sin(this.animationTime * 10) * 0.15;
+                this.player.mesh.position.y = bobAmount;
+
+                // Animation des membres
+                const armSwing = Math.sin(this.animationTime * 8) * 0.4;
+                const legSwing = Math.sin(this.animationTime * 8) * 0.3;
+
+                this.player.mesh.children.forEach((child, index) => {
+                    if (child.userData.isLeftArm) {
+                        child.rotation.x = armSwing;
+                    } else if (child.userData.isRightArm) {
+                        child.rotation.x = -armSwing;
+                    } else if (child.userData.isLeftLeg) {
+                        child.rotation.x = -legSwing;
+                    } else if (child.userData.isRightLeg) {
+                        child.rotation.x = legSwing;
+                    }
+                });
+            } else {
+                // Position de repos
+                this.player.mesh.position.y = 0;
+                this.player.mesh.children.forEach(child => {
+                    if (child.userData.isLeftArm || child.userData.isRightArm ||
+                        child.userData.isLeftLeg || child.userData.isRightLeg) {
+                        child.rotation.x = 0;
+                    }
+                });
+            }
+        }
+
+        updateCamera() {
+            if (!this.player.mesh) return;
+
+            // Position de caméra avec contrôles souris
+            const idealOffset = this.cameraState.offset.clone();
+            idealOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), this.mouseControls.yaw);
+            const targetCameraPosition = this.player.position.clone().add(idealOffset);
+
+            // Point de regard avec pitch
+            const lookAtOffset = this.cameraState.lookAtOffset.clone();
+            lookAtOffset.y += Math.tan(this.mouseControls.pitch) * idealOffset.length();
+            const targetLookAt = this.player.position.clone().add(lookAtOffset);
+
+            // Interpolation fluide
+            this.camera.position.lerp(targetCameraPosition, this.cameraState.smoothness);
+            this.camera.lookAt(targetLookAt);
+        }
+
+        animateCollectibles() {
+            this.collectibles.forEach(collectible => {
+                if (collectible.collected) return;
+
+                const mesh = collectible.mesh;
+                const userData = mesh.userData;
+
+                if (userData.isCoin) {
+                    // Rotation et flottement des pièces
+                    mesh.rotation.y += userData.spinSpeed;
+                    mesh.position.y = userData.originalY + Math.sin(this.animationTime * 3 + userData.floatOffset) * 0.4;
+
+                    // Brillance
+                    const brightness = Math.sin(this.animationTime * 5) * 0.2 + 0.8;
+                    mesh.material.emissiveIntensity = brightness * 0.3;
+
+                } else if (userData.isPowerUp) {
+                    // Pulsation des power-ups
+                    const scale = 1 + Math.sin(this.animationTime * 4 + userData.pulseOffset) * 0.3;
+                    mesh.scale.setScalar(scale);
+                    mesh.position.y = userData.originalY + Math.sin(this.animationTime * 2 + userData.pulseOffset) * 0.6;
+
+                    // Rotation lente
+                    mesh.rotation.y += 0.02;
+                    mesh.rotation.z += 0.01;
+
+                } else if (userData.isStar) {
+                    // Rotation et brillance des étoiles
+                    mesh.rotation.z += userData.rotationSpeed;
+                    mesh.position.y = userData.originalY + Math.sin(this.animationTime * 2.5 + userData.pulseOffset) * 0.8;
+
+                    const starScale = 1 + Math.sin(this.animationTime * 6) * 0.2;
+                    mesh.scale.setScalar(starScale);
+                }
+            });
+        }
+
+        animateRooms() {
+            this.rooms.forEach(room => {
+                const mesh = room.mesh;
+                const userData = mesh.userData;
+
+                // Flottement subtil des chambres
+                mesh.position.y = userData.originalY + Math.sin(this.animationTime * 0.8 + userData.floatOffset) * 0.08;
+
+                // Rotation du toit
+                if (mesh.children[3]) { // Le toit
+                    mesh.children[3].rotation.y += 0.005;
+                }
+
+                // Pulsation de la lumière
+                if (mesh.children[8]) { // La lumière
+                    const light = mesh.children[8];
+                    light.intensity = 1.2 + Math.sin(this.animationTime * 2) * 0.3;
+                }
+            });
+        }
+
+        animateEnvironment() {
+            // Animation des nuages
+            this.scene.children.forEach(child => {
+                if (child.userData && child.userData.isCloud) {
+                    child.position.x += 0.02;
+                    child.rotation.y += 0.001;
+
+                    // Réinitialiser position si trop loin
+                    if (child.position.x > 200) {
+                        child.position.x = -200;
+                    }
+                }
+            });
+        }
+
+        checkCollectibles() {
+            const playerPosition = this.player.position;
+
+            this.collectibles.forEach((collectible, index) => {
+                if (collectible.collected) return;
+
+                const distance = playerPosition.distanceTo(collectible.mesh.position);
+
+                if (distance < 3) {
+                    // Collecter l'objet
+                    collectible.collected = true;
+                    this.scene.remove(collectible.mesh);
+
+                    // Effets et points
+                    let message = '';
+                    if (collectible.type === 'coin') {
+                        this.coins += 1;
+                        this.score += collectible.value;
+                        message = `🪙 Pièce collectée ! +${collectible.value} points`;
+                    } else if (collectible.type === 'powerup') {
+                        this.score += collectible.value;
+                        message = `⭐ Power-up ! +${collectible.value} points`;
+                    } else if (collectible.type === 'star') {
+                        this.score += collectible.value;
+                        message = `🌟 Étoile magique ! +${collectible.value} points`;
+                    }
+
+                    this.showNotification(message);
+                    this.updateHUD();
+                }
+            });
+        }
+
+        checkInteractionZones() {
+            const playerPosition = this.player.position;
+            let nearRoom = null;
+
+            this.rooms.forEach(room => {
+                const distance = playerPosition.distanceTo(room.mesh.position);
+
+                if (distance < 15) {
+                    nearRoom = room.data;
+                }
+            });
+
+            if (nearRoom !== this.nearbyRoom) {
+                this.nearbyRoom = nearRoom;
+
+                const crosshair = document.getElementById('crosshair');
+                if (nearRoom) {
+                    crosshair.classList.add('interactable');
+                    this.showNotification(`🚪 Appuyez sur E pour explorer : ${nearRoom.name}`);
+                } else {
+                    crosshair.classList.remove('interactable');
+                }
+            }
+        }
+
+        handleInteraction() {
+            if (this.nearbyRoom) {
+                this.showRoomModal(this.nearbyRoom);
+            }
+        }
+
+        showRoomModal(roomData) {
+            this.currentRoom = roomData;
+
+            // Remplir le modal avec les données
+            document.getElementById('roomTitle').textContent = `${roomData.icon} ${roomData.name}`;
+            document.getElementById('roomDescription').textContent = roomData.description;
+
+            // Technologies
+            const techContainer = document.getElementById('roomTechnologies');
+            techContainer.innerHTML = '';
+            roomData.technologies.forEach(tech => {
+                const badge = document.createElement('div');
+                badge.className = 'tech-badge';
+                badge.textContent = tech;
+                techContainer.appendChild(badge);
+            });
+
+            // Afficher et pauser
+            document.getElementById('roomInfo').classList.add('show');
+            this.gamePaused = true;
+        }
+
+        closeRoomModal() {
+            document.getElementById('roomInfo').classList.remove('show');
+            this.currentRoom = null;
+            this.gamePaused = false;
+        }
+
+        enterRoom(roomData) {
+            console.log('🏠 Entrée dans la chambre:', roomData.name);
+
+            this.isInRoom = true;
+            this.gamePaused = true;
+
+            this.closeRoomModal();
+
+            // Créer le contenu de la chambre
+            const roomInterior = document.getElementById('roomInterior');
+            const roomContent = document.getElementById('roomContent');
+
+            roomContent.innerHTML = `
+            <div class="room-title" style="color: #${roomData.color.toString(16).padStart(6, '0')}; margin-bottom: 30px;">
+                ${roomData.icon} ${roomData.name}
+            </div>
+
+            <div style="margin: 25px 0; text-align: left;">
+                <h3 style="color: #FFD700; margin-bottom: 15px; text-align: center;">📋 Description du projet</h3>
+                <p style="color: #e0e0e0; line-height: 1.8; font-size: 16px;">
+                    ${roomData.description}
+                </p>
+            </div>
+
+            <div style="margin: 25px 0;">
+                <h3 style="color: #FFD700; margin-bottom: 15px;">🎯 Consigne et objectifs</h3>
+                <p style="color: #ccc; font-style: italic; line-height: 1.6;">
+                    ${roomData.consigne}
+                </p>
+            </div>
+
+            <div style="margin: 25px 0;">
+                <h3 style="color: #FFD700; margin-bottom: 15px;">💻 Technologies maîtrisées</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+                    ${roomData.technologies.map(tech => `
+                        <span class="tech-badge" style="font-size: 13px; padding: 8px 16px;">${tech}</span>
+                    `).join('')}
+                </div>
+            </div>
+
+            ${roomData.features ? `
+            <div style="margin: 25px 0;">
+                <h3 style="color: #FFD700; margin-bottom: 15px;">⚡ Fonctionnalités clés</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                    ${roomData.features.map(feature => `
+                        <div style="background: rgba(255, 215, 0, 0.1); padding: 10px; border-radius: 8px; border: 1px solid rgba(255, 215, 0, 0.3);">
+                            ✨ ${feature}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+
+            <div style="margin: 35px 0; text-align: center;">
+                <button class="room-btn primary" onclick="window.marioGame.downloadProject('${roomData.zipFile}')"
+                        style="font-size: 16px; padding: 15px 30px;">
+                    📦 Télécharger le projet complet
+                </button>
+            </div>
+        `;
+
+            // Couleur thématique
+            roomInterior.style.background = `linear-gradient(135deg, #${roomData.color.toString(16).padStart(6, '0')}15, #1a1a2e)`;
+            roomInterior.classList.add('active');
+
+            // Mise à jour HUD
+            document.getElementById('room3D').textContent = roomData.name;
+        }
+
+        exitRoom() {
+            console.log('🚪 Sortie de la chambre');
+
+            this.isInRoom = false;
+            this.gamePaused = false;
+
+            document.getElementById('roomInterior').classList.remove('active');
+            document.getElementById('room3D').textContent = this.currentRoomName;
+        }
+
+        downloadProject(zipFile) {
+            console.log('📦 Téléchargement simulé:', zipFile);
+
+            this.showNotification(`📦 Projet téléchargé : ${zipFile}`);
+            this.score += 2000;
+            this.updateHUD();
+
+            // Simulation d'un téléchargement
+            const link = document.createElement('a');
+            link.href = '#';
+            link.download = zipFile;
+            link.textContent = 'Télécharger';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+        }
+
+        viewProjectDetails(roomData) {
+            console.log('📄 Affichage détails:', roomData.name);
+            this.showNotification(`📄 Détails affichés pour ${roomData.name}`);
+        }
+
+        updateMinimap() {
+            const player = document.getElementById('minimapPlayer');
+            if (!player || !this.player.position) return;
+
+            const mapSize = 200;
+            const worldSize = 280;
+
+            const x = ((this.player.position.x + worldSize/2) / worldSize) * mapSize;
+            const z = ((this.player.position.z + worldSize/2) / worldSize) * mapSize;
+
+            player.style.left = `${Math.max(4, Math.min(mapSize - 14, x))}px`;
+            player.style.top = `${Math.max(4, Math.min(mapSize - 14, z))}px`;
+        }
+
+        updateHUD() {
+            document.getElementById('score3D').textContent = this.score.toLocaleString();
+            document.getElementById('coins3D').textContent = this.coins;
+
+            // Mise à jour du niveau basé sur le score
+            const level = Math.floor(this.score / 5000) + 1;
+            document.querySelector('.hud-title').textContent = `🎮 MARIO PORTFOLIO - NIVEAU ${level}`;
+        }
+
+        showNotification(message) {
+            // Supprimer anciennes notifications
+            const oldNotifs = document.querySelectorAll('.notification');
+            oldNotifs.forEach(notif => notif.remove());
+
+            // Nouvelle notification
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            // Auto-suppression
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideInFromRight 0.3s ease-in reverse';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 4000);
+        }
+
+        hideLoading() {
+            const loading = document.getElementById('loading3D');
+            if (loading) {
+                loading.style.opacity = '0';
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                }, 600);
+            }
+        }
+
+        pauseGame() {
+            this.gamePaused = true;
+            console.log('⏸️ Jeu en pause');
+        }
+
+        resumeGame() {
+            if (this.isInRoom) return;
+            this.gamePaused = false;
+            console.log('▶️ Jeu repris');
+        }
+
+        handleResize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            this.camera.aspect = width / height;
+            this.camera.updateProjectionMatrix();
+            this.renderer.setSize(width, height);
+
+            console.log('📏 Redimensionnement:', width, 'x', height);
+        }
+
+        showError(title, message) {
+            console.error('❌', title, ':', message);
+
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = `
+            <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; padding: 40px;
+                        border-radius: 20px; text-align: center; z-index: 10000; max-width: 500px;
+                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);">
+                <h2 style="margin-bottom: 20px; font-size: 24px;">❌ ${title}</h2>
+                <p style="margin-bottom: 25px; line-height: 1.6;">${message}</p>
+                <button onclick="location.reload()"
+                        style="padding: 15px 30px; background: white; color: #e74c3c; border: none;
+                               border-radius: 25px; cursor: pointer; font-weight: bold; font-size: 16px;">
+                    🔄 Recharger la page
+                </button>
+            </div>
+        `;
+            document.body.appendChild(errorDiv);
+        }
+
+        destroy() {
+            console.log('🔥 Destruction du jeu');
+
+            this.gameLoaded = false;
+
+            if (this.renderer) {
+                this.renderer.dispose();
+            }
+
+            // Nettoyage des événements
+            document.removeEventListener('keydown', this.handleKeyDown);
+            document.removeEventListener('keyup', this.handleKeyUp);
+            window.removeEventListener('resize', this.handleResize);
+        }
+    }
+
+    // ===================== INITIALISATION GLOBALE =====================
+
+    let marioGame;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('🎮 Démarrage du Portfolio Mario 3D...');
+
+        try {
+            marioGame = new Mario3DPortfolio();
+            window.marioGame = marioGame;
+
+            console.log('✅ Portfolio Mario 3D initialisé avec succès !');
+
+        } catch (error) {
+            console.error('❌ Erreur critique lors de l\'initialisation:', error);
+
+            document.body.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;
+                        height: 100vh; background: linear-gradient(135deg, #e74c3c, #c0392b); color: white; text-align: center; padding: 20px;">
+                <h1 style="font-size: 3em; margin-bottom: 30px;">❌ Erreur Critique</h1>
+                <p style="font-size: 1.3em; margin-bottom: 20px; max-width: 600px; line-height: 1.6;">
+                    Impossible de charger le Portfolio Mario 3D
+                </p>
+                <p style="margin-bottom: 40px; opacity: 0.9; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;">
+                    <strong>Erreur:</strong> ${error.message}
+                </p>
+                <button onclick="location.reload()"
+                        style="padding: 20px 40px; font-size: 1.2em; background: white; color: #e74c3c;
+                               border: none; border-radius: 30px; cursor: pointer; font-weight: bold;
+                               box-shadow: 0 8px 25px rgba(0,0,0,0.3); transition: transform 0.3s ease;">
+                    🔄 Recharger la page
+                </button>
+            </div>
+        `;
+        }
+    });
+
+    // Fonctions globales
+    window.downloadProject = function(zipFile) {
+        if (window.marioGame) {
+            window.marioGame.downloadProject(zipFile);
+        }
+    };
+
+    console.log('🎮 Portfolio Mario 3D - Script chargé et prêt !');
+</script>
+</body>
+</html>

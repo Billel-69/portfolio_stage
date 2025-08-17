@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billel Hakkas - Développeur Web & Mobile</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/projects.css">
+    <link rel="stylesheet" href="css/game-mode.css">
+</head>
+<body>
+<!-- Navigation -->
+<nav class="navbar" id="navbar">
+    <div class="nav-container">
+        <div class="logo">
+            <span class="logo-text">Billel</span>
+            <span class="logo-accent">.dev</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#home" class="nav-link active">Accueil</a></li>
+            <li><a href="#about" class="nav-link">À propos</a></li>
+            <li><a href="#projects" class="nav-link">Projets</a></li>
+            <li><a href="#skills" class="nav-link">Compétences</a></li>
+            <!-- Ajout du lien vers la section Stage -->
+            <li><a href="#stage" class="nav-link">Stage</a></li>
+            <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="hero-background">
+        <div class="hero-particles"></div>
+    </div>
+    <div class="container">
+        <div class="hero-content">
+            <div class="hero-text fade-in-up">
+                <h1 class="hero-title">
+                    Bonjour, je suis <span class="text-gradient">Billel Hakkas</span>
+                </h1>
+                <p class="hero-subtitle">Développeur Web & Mobile</p>
+                <p class="hero-description">
+                    Étudiant en BUT Informatique à l'IUT Lyon 1, passionné par le développement
+                    d'applications modernes et l'innovation technologique. Spécialisé en développement
+                    web et mobile avec une approche centrée utilisateur.
+                </p>
+                <div class="hero-cta">
+                    <a href="#projects" class="btn btn-primary">
+                        <span>Découvrir mes projets</span>
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7 17L17 7M17 7H7M17 7V17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </a>
+                    <a href="#contact" class="btn btn-outline">
+                        <span>Me contacter</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual fade-in-right">
+                <div class="code-editor">
+                    <div class="editor-header">
+                        <div class="editor-controls">
+                            <span class="control red"></span>
+                            <span class="control yellow"></span>
+                            <span class="control green"></span>
+                        </div>
+                        <div class="editor-title">portfolio.js</div>
+                    </div>
+                    <div class="editor-content">
+                        <div class="code-line">
+                            <span class="line-number">1</span>
+                            <span class="code-text">
+                                    <span class="keyword">class</span> <span class="class-name">Developer</span> <span class="bracket">{</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">2</span>
+                            <span class="code-text">
+                                    &nbsp;&nbsp;<span class="keyword">constructor</span><span class="bracket">()</span> <span class="bracket">{</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">3</span>
+                            <span class="code-text">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="property">this</span>.<span class="property">name</span> = <span class="string">"Billel Hakkas"</span><span class="punctuation">;</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">4</span>
+                            <span class="code-text">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="property">this</span>.<span class="property">title</span> = <span class="string">"Développeur"</span><span class="punctuation">;</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">5</span>
+                            <span class="code-text">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="property">this</span>.<span class="property">skills</span> = <span class="bracket">[</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">6</span>
+                            <span class="code-text">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"Java"</span><span class="punctuation">,</span> <span class="string">"Python"</span><span class="punctuation">,</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">7</span>
+                            <span class="code-text">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="string">"JavaScript"</span><span class="punctuation">,</span> <span class="string">"PHP"</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">8</span>
+                            <span class="code-text">
+                                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="bracket">];</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">9</span>
+                            <span class="code-text">
+                                    &nbsp;&nbsp;<span class="bracket">}</span>
+                                </span>
+                        </div>
+                        <div class="code-line">
+                            <span class="line-number">10</span>
+                            <span class="code-text">
+                                    <span class="bracket">}</span>
+                                </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<!-- About Section -->
+<section class="section about-section" id="about">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title">À propos de moi</h2>
+            <p class="section-subtitle">
+                Passionné de technologie depuis toujours, je développe mes compétences
+                en informatique pour créer des solutions innovantes et impactantes.
+            </p>
+        </div>
+
+        <div class="about-content">
+            <div class="about-text fade-in-left">
+                <div class="about-card">
+                    <h3>Mon parcours</h3>
+                    <p>
+                        Étudiant en BUT Informatique à l'IUT Lyon 1, spécialisé en développement
+                        d'applications et de sites web. Mon parcours a commencé par une passion
+                        pour les jeux vidéo qui m'a naturellement orienté vers la programmation.
+                    </p>
+                    <p>
+                        Depuis ma première année, j'ai développé une expertise dans plusieurs
+                        langages de programmation et frameworks modernes, avec un focus particulier
+                        sur l'expérience utilisateur et les performances.
+                    </p>
+                </div>
+
+                <div class="education-timeline">
+                    <h3>Formation</h3>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>BUT Informatique - IUT Lyon 1</h4>
+                            <span class="timeline-date">2023 - 2026 (en cours)</span>
+                            <p>Spécialisé en développement d'application et web</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <h4>Baccalauréat Général - Lycée Robert Doisneau</h4>
+                            <span class="timeline-date">2020 - 2023</span>
+                            <p>Mention bien - Spécialité NSI (19/20)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-stats fade-in-right">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-number" data-target="3">0</div>
+                        <div class="stat-label">Années d'études</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💻</div>
+                        <div class="stat-number" data-target="10">0</div>
+                        <div class="stat-label">Projets réalisés</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🛠️</div>
+                        <div class="stat-number" data-target="8">0</div>
+                        <div class="stat-label">Technologies maîtrisées</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🏆</div>
+                        <div class="stat-number" data-target="19">0</div>
+                        <div class="stat-label">Note NSI (/20)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects Section -->
+<section class="section projects-section" id="projects">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title">Mes Projets</h2>
+            <p class="section-subtitle">
+                Découvrez une sélection de mes réalisations, allant de la gestion de données
+                à l'interface utilisateur, en passant par les jeux vidéo.
+            </p>
+        </div>
+
+        <!-- Mode Toggle -->
+        <div class="projects-mode-toggle fade-in-up">
+            <div class="toggle-container">
+                <button class="mode-btn active" data-mode="cards">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Vue Cards
+                </button>
+                <button class="mode-btn" data-mode="game">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 12h4m4 0h4m-7-3v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <rect x="2" y="8" width="20" height="8" rx="2" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                    Mode Jeu
+                </button>
+            </div>
+        </div>
+
+        <!-- Cards Mode -->
+        <div class="projects-container cards-mode active" id="cardsMode">
+            <div class="projects-grid">
+                <!-- Project 1 -->
+                <div class="project-card fade-in-up" data-project="gestion-vols">
+                    <div class="project-image">
+                        <div class="project-icon">💻</div>
+                        <div class="project-overlay">
+                            <button class="project-btn">Voir détails</button>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Gestion des vols - GESTION'AIR</h3>
+                        <p class="project-description">
+                            Application complète en C pour la gestion des vols commerciaux
+                            avec recherche avancée et gestion temps réel.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag">C</span>
+                            <span class="tech-tag">Algorithmique</span>
+                            <span class="tech-tag">Structures de données</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="project-card fade-in-up" data-project="transport-propre">
+                    <div class="project-image">
+                        <div class="project-icon">🌱</div>
+                        <div class="project-overlay">
+                            <button class="project-btn">Voir détails</button>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Université & Transports Propres</h3>
+                        <p class="project-description">
+                            Site web responsive présentant les initiatives universitaires
+                            pour une mobilité durable.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag">HTML5</span>
+                            <span class="tech-tag">CSS3</span>
+                            <span class="tech-tag">Responsive</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3 -->
+                <div class="project-card fade-in-up" data-project="planification-aerien">
+                    <div class="project-image">
+                        <div class="project-icon">✈️</div>
+                        <div class="project-overlay">
+                            <button class="project-btn">Voir détails</button>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Planification Transport Aérien</h3>
+                        <p class="project-description">
+                            Système de gestion d'espace aérien utilisant la coloration
+                            de graphe pour optimiser les trajectoires.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Java</span>
+                            <span class="tech-tag">Graphstream</span>
+                            <span class="tech-tag">Algorithmes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4 -->
+                <div class="project-card fade-in-up" data-project="street-fighter">
+                    <div class="project-image">
+                        <div class="project-icon">🥊</div>
+                        <div class="project-overlay">
+                            <button class="project-btn">Voir détails</button>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Jeu de Combat Street Fighter</h3>
+                        <p class="project-description">
+                            Jeu de combat complet avec animations fluides,
+                            coups spéciaux et environnements variés.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag">Python</span>
+                            <span class="tech-tag">Pygame</span>
+                            <span class="tech-tag">Game Design</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 5 -->
+                <div class="project-card fade-in-up" data-project="app-communicante">
+                    <div class="project-image">
+                        <div class="project-icon">💬</div>
+                        <div class="project-overlay">
+                            <button class="project-btn">Voir détails</button>
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3 class="project-title">Application Communicante</h3>
+                        <p class="project-description">
+                            Plateforme collaborative pour la gestion de contenus
+                            multimédias et interactions communautaires.
+                        </p>
+                        <div class="project-tech">
+                            <span class="tech-tag">PHP</span>
+                            <span class="tech-tag">JavaScript</span>
+                            <span class="tech-tag">SQL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Mode -->
+        <div class="projects-container game-mode" id="gameMode">
+            <div class="game-world">
+                <div class="game-ui">
+                    <div class="game-info">
+                        <h3>🎮 Portfolio Interactif</h3>
+                        <p>Cliquez sur les portes pour explorer mes projets</p>
+                    </div>
+                    <div class="game-controls">
+                        <span>🖱️ Cliquez pour interagir</span>
+                    </div>
+                </div>
+
+                <div class="game-scene">
+                    <div class="character" id="gameCharacter">
+                        <div class="character-sprite">🧑‍💻</div>
+                    </div>
+
+                    <div class="project-door door-1" data-project="gestion-vols">
+                        <div class="door-icon">💻</div>
+                        <div class="door-label">Gestion Vols (C)</div>
+                    </div>
+
+                    <div class="project-door door-2" data-project="transport-propre">
+                        <div class="door-icon">🌱</div>
+                        <div class="door-label">Transport Propre</div>
+                    </div>
+
+                    <div class="project-door door-3" data-project="planification-aerien">
+                        <div class="door-icon">✈️</div>
+                        <div class="door-label">Planification Aérienne</div>
+                    </div>
+
+                    <div class="project-door door-4" data-project="street-fighter">
+                        <div class="door-icon">🥊</div>
+                        <div class="door-label">Street Fighter</div>
+                    </div>
+
+                    <div class="project-door door-5" data-project="app-communicante">
+                        <div class="door-icon">💬</div>
+                        <div class="door-label">App Communicante</div>
+                    </div>
+                </div>
+
+                <div class="game-minimap">
+                    <div class="minimap-character"></div>
+                    <div class="minimap-doors">
+                        <div class="minimap-door"></div>
+                        <div class="minimap-door"></div>
+                        <div class="minimap-door"></div>
+                        <div class="minimap-door"></div>
+                        <div class="minimap-door"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Skills Section -->
+<section class="section skills-section" id="skills">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title">Compétences</h2>
+            <p class="section-subtitle">
+                Une expertise technique diversifiée acquise à travers mes études et projets personnels.
+            </p>
+        </div>
+
+        <div class="skills-grid">
+            <div class="skill-category fade-in-up">
+                <div class="skill-icon">💻</div>
+                <h3>Langages de Programmation</h3>
+                <div class="skill-items">
+                    <div class="skill-item">
+                        <span class="skill-name">Java</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="85"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Python</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="80"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">JavaScript</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="75"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">C</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="70"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">PHP</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="65"></div>
+                        </div>
+                    </div>
+                    <!-- Ajout des nouveaux langages appris lors du stage -->
+                    <div class="skill-item">
+                        <span class="skill-name">Kotlin</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="60"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="skill-category fade-in-up">
+                <div class="skill-icon">🌐</div>
+                <h3>Technologies Web</h3>
+                <div class="skill-items">
+                    <div class="skill-item">
+                        <span class="skill-name">HTML/CSS</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="90"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Vue.js</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="70"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Node.js</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="65"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Symphony</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="60"></div>
+                        </div>
+                    </div>
+                    <!-- Nouvelles technologies web acquises lors du stage -->
+                    <div class="skill-item">
+                        <span class="skill-name">React</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="70"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Express.js</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="65"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Tailwind CSS</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="60"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="skill-category fade-in-up">
+                <div class="skill-icon">🗄️</div>
+                <h3>Outils & Méthodes</h3>
+                <div class="skill-items">
+
+                    <div class="skill-item">
+                        <span class="skill-name">Git</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="80"></div>
+                        </div>
+                    </div>
+                    <div class="skill-item">
+                        <span class="skill-name">Agile</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="70"></div>
+                        </div>
+                    </div>
+                    <!-- Outils et méthodes supplémentaires issus du stage -->
+                    <div class="skill-item">
+                        <span class="skill-name">MySQL</span>
+                        <div class="skill-bar">
+                            <div class="skill-progress" data-progress="70"></div>
+                        </div>
+                    </div>
+
+
+                    <!-- Kotlin a été déplacé dans la catégorie des langages -->
+                </div>
+            </div>
+        </div>
+
+        <div class="soft-skills fade-in-up">
+            <h3>Qualités Personnelles</h3>
+            <div class="soft-skills-grid">
+                <div class="soft-skill">
+                    <div class="soft-skill-icon">🎯</div>
+                    <span>Rigoureux</span>
+                </div>
+                <div class="soft-skill">
+                    <div class="soft-skill-icon">👂</div>
+                    <span>À l'écoute</span>
+                </div>
+                <div class="soft-skill">
+                    <div class="soft-skill-icon">🚀</div>
+                    <span>Motivé</span>
+                </div>
+                <div class="soft-skill">
+                    <div class="soft-skill-icon">🔧</div>
+                    <span>Autonome</span>
+                </div>
+                <div class="soft-skill">
+                    <div class="soft-skill-icon">🤝</div>
+                    <span>Sociable</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stage Section -->
+<section class="section stage-section" id="stage">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title">Stage 2025</h2>
+            <p class="section-subtitle">
+                Aperçu des missions réalisées lors de mon stage de deuxième année et des compétences mobilisées.
+            </p>
+        </div>
+        <div class="stage-grid">
+            <div class="stage-card fade-in-up">
+                <h3>API de quêtes</h3>
+                <p>Conception et développement d’une API RESTful pour gérer les quêtes et les utilisateurs au sein de la plateforme.</p>
+                <ul>
+                    <li>Modélisation et implémentation de la base de données (tables Quêtes, Utilisateurs, Classes)</li>
+                    <li>Création d’API REST (CRUD) sécurisées avec authentification JWT</li>
+                    <li>Mise en place des règles de validation et gestion des erreurs</li>
+                </ul>
+                <p><strong>Compétences :</strong> Réaliser un développement d’application, Gérer des données de l’information, Conduire un projet.</p>
+            </div>
+            <div class="stage-card fade-in-up">
+                <h3>Chatbot documentaire RAG</h3>
+                <p>Développement d’un moteur de recherche de documents intégrant un système de questions/réponses à l’aide du modèle GPT.</p>
+                <ul>
+                    <li>Collecte et indexation de documents dans une base vectorielle FAISS</li>
+                    <li>Exploitation de GPT pour générer des réponses pertinentes à partir des extraits récupérés</li>
+                    <li>Conception d’une interface utilisateur et intégration via React/Express</li>
+                </ul>
+                <p><strong>Compétences :</strong> Réaliser un développement d’application, Gérer et valoriser des données, Optimiser des applications informatiques.</p>
+            </div>
+            <div class="stage-card fade-in-up">
+                <h3>Comptes et Classes en direct</h3>
+                <p>Mise en place des fonctionnalités sociales de la plateforme : comptes utilisateurs, classes virtuelles en direct et messagerie.</p>
+                <ul>
+                    <li>Gestion des inscriptions, authentification et profils utilisateurs</li>
+                    <li>Organisation des classes en direct via le SDK Agora et WebRTC</li>
+                    <li>Implémentation d’un système de chat en temps réel avec Socket.IO</li>
+                </ul>
+                <p><strong>Compétences :</strong> Réaliser un développement d’application, Administrer des systèmes informatiques communicants complexes, Conduire un projet.</p>
+            </div>
+            <div class="stage-card fade-in-up">
+                <h3>Bibliothèque vidéo</h3>
+                <p>Conception d’une bibliothèque de contenus vidéo type Netflix pour enrichir l’expérience d’apprentissage.</p>
+                <ul>
+                    <li>Encodage et optimisation des vidéos (FFmpeg) pour le streaming adaptatif</li>
+                    <li>Mise en place de l’upload sécurisé et de la modération des contenus</li>
+                    <li>Prototypage d’un système de recommandations basé sur les préférences des utilisateurs</li>
+                </ul>
+                <p><strong>Compétences :</strong> Réaliser un développement d’application, Optimiser des applications informatiques, Gérer des données de l’information.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="section contact-section" id="contact">
+    <div class="container">
+        <div class="section-header fade-in-up">
+            <h2 class="section-title">Contact</h2>
+            <p class="section-subtitle">
+                Je recherche activement un stage et une alternance.
+                N'hésitez pas à me contacter pour discuter de vos projets !
+            </p>
+        </div>
+
+        <div class="contact-content">
+            <div class="contact-info fade-in-left">
+                <div class="contact-card">
+                    <h3>Opportunités recherchées</h3>
+                    <div class="opportunity-item">
+                        <div class="opportunity-icon">🎯</div>
+                        <div class="opportunity-details">
+                            <h4>Stage 2025</h4>
+                            <p>Du 14 avril 2025 - Durée : 8 à 12 semaines</p>
+                            <span class="opportunity-type">Développement informatique</span>
+                        </div>
+                    </div>
+                    <div class="opportunity-item">
+                        <div class="opportunity-icon">🔄</div>
+                        <div class="opportunity-details">
+                            <h4>Alternance 2025-2026</h4>
+                            <p>À partir du 1er septembre 2025</p>
+                            <span class="opportunity-type">Rythme : 1 semaine sur 2</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-methods">
+                    <div class="contact-method">
+                        <div class="contact-icon">📧</div>
+                        <div class="contact-details">
+                            <h4>Email</h4>
+                            <a href="mailto:billel.hakkas@gmail.com">billel.hakkas@gmail.com</a>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <div class="contact-icon">📱</div>
+                        <div class="contact-details">
+                            <h4>Téléphone</h4>
+                            <a href="tel:+33617036881">06 17 03 68 81</a>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <div class="contact-icon">📍</div>
+                        <div class="contact-details">
+                            <h4>Localisation</h4>
+                            <span>Vaulx-en-Velin, France</span>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <div class="contact-icon">💼</div>
+                        <div class="contact-details">
+                            <h4>LinkedIn</h4>
+                            <a href="https://www.linkedin.com/in/billel-hakkas" target="_blank">Mon profil LinkedIn</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-cta fade-in-right">
+                <div class="cta-card">
+                    <h3>Prêt à collaborer ?</h3>
+                    <p>
+                        Passionné par l'innovation technologique et toujours en quête de nouveaux défis,
+                        je serais ravi de contribuer à vos projets et d'apporter ma créativité et mon
+                        expertise technique à votre équipe.
+                    </p>
+                    <div class="cta-actions">
+                        <a href="mailto:billel.hakkas@gmail.com" class="btn btn-primary">
+                            <span>Envoyer un email</span>
+                        </a>
+                        <a href="tel:+33617036881" class="btn btn-outline">
+                            <span>Appeler maintenant</span>
+                        </a>
+                    </div>
+
+                    <div class="availability-status">
+                        <div class="status-indicator active"></div>
+                        <span>Disponible pour de nouvelles opportunités</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="container">
+        <div class="footer-content">
+            <div class="footer-text">
+                <p>&copy; 2025 Billel Hakkas - Portfolio BUT Informatique</p>
+            </div>
+            <div class="footer-links">
+                <a href="mailto:billel.hakkas@gmail.com" class="footer-link">Email</a>
+                <a href="https://www.linkedin.com/in/billel-hakkas" target="_blank" class="footer-link">LinkedIn</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- Project Modal -->
+<div class="modal" id="projectModal">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+        <button class="modal-close" id="modalClose">&times;</button>
+        <div class="modal-body" id="modalBody">
+            <!-- Content will be loaded dynamically -->
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="js/main.js"></script>
+<script src="js/animations.js"></script>
+<script src="js/projects.js"></script>
+<script src="js/game-mode.js"></script>
+</body>
+</html>
