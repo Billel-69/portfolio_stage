@@ -72,7 +72,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    bottom: -var(--space-lg);
+    bottom: var(--space-lg);
     width: 2px;
     background: var(--gray-200);
 }

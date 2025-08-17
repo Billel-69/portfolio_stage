@@ -151,16 +151,18 @@
     50% { filter: brightness(1.5) hue-rotate(30deg); }
 }
 
+
 @keyframes celebrationBurst {
     from {
-        transform: translate(-50%, -50%) rotate(var(--angle)) translateX(0);
+        transform: translate(-50%, -50%) rotate(0deg) translateX(0);
         opacity: 1;
     }
     to {
-        transform: translate(-50%, -50%) rotate(var(--angle)) translateX(var(--distance));
+        transform: translate(-50%, -50%) rotate(360deg) translateX(100px);
         opacity: 0;
     }
 }
+
 
 @keyframes blockHit {
     0% { transform: translateY(0); }

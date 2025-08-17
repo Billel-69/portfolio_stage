@@ -434,7 +434,7 @@ a:hover {
 .section-title::after {
     content: '';
     position: absolute;
-    bottom: -var(--space-sm);
+    bottom: var(--space-sm);
     left: 50%;
     transform: translateX(-50%);
     width: 60px;
@@ -445,7 +445,7 @@ a:hover {
 
 .section-subtitle {
     font-size: 1.125rem;
-    color: var(--gray-600);
+    color: black;
     line-height: 1.6;
 }
 
@@ -601,8 +601,7 @@ a:hover {
 }
 
 /* Amélioration contraste */
-.hero-description,
-.section-subtitle {
+.hero-description{
     color: rgba(255, 255, 255, 0.9);
 }
 
