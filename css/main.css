@@ -186,6 +186,7 @@ a:hover {
 }
 
 .nav-link:hover,
+.nav-link:focus,
 .nav-link.active {
     color: var(--primary);
     background-color: var(--gray-100);
@@ -329,7 +330,8 @@ a:hover {
     box-shadow: var(--shadow-lg);
 }
 
-.btn-primary:hover {
+.btn-primary:hover,
+.btn-primary:focus {
     transform: translateY(-2px);
     box-shadow: var(--shadow-xl);
     color: var(--primary-dark);
@@ -341,7 +343,8 @@ a:hover {
     border: 2px solid white;
 }
 
-.btn-outline:hover {
+.btn-outline:hover,
+.btn-outline:focus {
     background: white;
     color: var(--primary);
 }
@@ -586,9 +589,13 @@ a:hover {
 }
 
 /* Amélioration accessibilité */
-.btn:focus-visible,
-.nav-link:focus-visible,
-.project-btn:focus-visible {
+.btn:focus,
+.nav-link:focus,
+.project-btn:focus,
+.mobile-menu-toggle:focus,
+.mode-btn:focus,
+.project-card:focus,
+.skill-category:focus {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
 }
