@@ -434,7 +434,7 @@ a:hover {
 .section-title::after {
     content: '';
     position: absolute;
-    bottom: var(--space-sm);
+    bottom: -var(--space-sm);
     left: 50%;
     transform: translateX(-50%);
     width: 60px;
@@ -445,7 +445,7 @@ a:hover {
 
 .section-subtitle {
     font-size: 1.125rem;
-    color: black;
+    color: var(--gray-600);
     line-height: 1.6;
 }
 
@@ -600,8 +600,11 @@ a:hover {
     cursor: pointer;
 }
 
-/* Amélioration contraste */
-.hero-description{
+/* Amélioration contraste
+   La description du héros se trouve sur un fond sombre. Pour améliorer la lisibilité,
+   on lui applique une couleur claire. On évite de cibler .section-subtitle ici car
+   cette classe est réutilisée dans d'autres sections sur fond clair. */
+.hero-description {
     color: rgba(255, 255, 255, 0.9);
 }
 
