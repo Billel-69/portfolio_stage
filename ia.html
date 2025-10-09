@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assistant IA</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <span class="logo-text">Billel</span><span class="logo-accent">.dev</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="index.html#home" class="nav-link">Accueil</a></li>
+        <li><a href="index.html#about" class="nav-link">À propos</a></li>
+        <li><a href="index.html#projects" class="nav-link">Projets</a></li>
+        <li><a href="index.html#skills" class="nav-link">Compétences</a></li>
+        <li><a href="index.html#stage" class="nav-link">Stage</a></li>
+        <li><a href="index.html#contact" class="nav-link">Contact</a></li>
+        <li><a href="ia.html" class="nav-link active">IA</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="section" id="ia">
+    <div class="container">
+      <h1>Assistant IA</h1>
+      <form id="iaForm">
+        <label for="document">Document</label>
+        <select id="document">
+          <option value="resume">Résumé</option>
+        </select>
+        <label for="question">Question</label>
+        <input type="text" id="question" required />
+        <button type="submit">Envoyer</button>
+      </form>
+      <div id="response" style="margin-top:1rem;"></div>
+    </div>
+  </section>
+
+  <script src="js/ia.js"></script>
+</body>
+</html>
